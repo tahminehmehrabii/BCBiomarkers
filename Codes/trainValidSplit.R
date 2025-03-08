@@ -1,25 +1,24 @@
 library(data.table)
-
 setwd("C:/Users/MHR/Desktop/PDAC")
 
-samples <- as.data.frame(fread("mergeDatasets.csv"))
-rownames(samples) <- samples$V1
-samples <- samples[,-1]
+samples <- fread("mergeDatasets.csv")
+setDF(samples)
+rownames(samples) <- samples[[1]]
+samples <- samples[, -1, drop = FALSE]
 
-cancerSamples <- rownames(samples)[which(samples$group == 2)]
-normalSamples <- rownames(samples)[which(samples$group == 1)]
+split_samples <- function(sample_names, ratio = 0.7) {
+  train_idx <- sample(seq_along(sample_names), ceiling(ratio * length(sample_names)))
+  list(train = sample_names[train_idx], valid = sample_names[-train_idx])
+}
 
-trainingCancerSamples <- cancerSamples[sample(1:length(cancerSamples), ceiling(0.7*length(cancerSamples)))]
-validationCancerSamples <- cancerSamples[-which(cancerSamples %in% trainingCancerSamples)]
+cancerSamples <- rownames(samples)[samples$group == 2]
+normalSamples <- rownames(samples)[samples$group == 1]
 
-trainingNormalSamples <- normalSamples[sample(1:length(normalSamples), ceiling(0.7*length(normalSamples)))]
-validationNormalSamples <- normalSamples[-which(normalSamples %in% trainingNormalSamples)]
+cancerSplit <- split_samples(cancerSamples)
+normalSplit <- split_samples(normalSamples)
 
-trainingSamples <- union(trainingCancerSamples, trainingNormalSamples)
-validationSamples <- union(validationCancerSamples, validationNormalSamples)
+trainingSamples <- c(cancerSplit$train, normalSplit$train)
+validationSamples <- c(cancerSplit$valid, normalSplit$valid)
 
-trainingSet <- samples[which(rownames(samples) %in% trainingSamples),]
-validationSet <- samples[which(rownames(samples) %in% validationSamples),]
-
-write.csv(trainingSet, "training_set.csv")
-write.csv(validationSet, "validation_set.csv")
+write.csv(samples[trainingSamples, , drop = FALSE], "training_set.csv")
+write.csv(samples[validationSamples, , drop = FALSE], "validation_set.csv")
