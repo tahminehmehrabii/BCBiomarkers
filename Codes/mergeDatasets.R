@@ -1,59 +1,170 @@
-library(GEOquery); library(dplyr); library(data.table)
-library(org.Hs.eg.db); library(annotate); library(preprocessCore)
+
+######################
+# Micro.Array Breast cancer 
+library(GEOquery)
+library(dplyr)
+library(data.table)
+library(org.Hs.eg.db)
+library(annotate)
+library(preprocessCore)
 library(EnsDb.Hsapiens.v79)
 
-setwd("C:/Users/MHR/Desktop/PDAC")
+# Set the current working directory to the project path
+setwd("C:/Users/MHR/Desktop/Breast")
 
-gse_list <- lapply(c("GSE71989", "GSE46234", "GSE15471"), function(gse) getGEO(gse, destdir = getwd())[[1]])
+#### Load data ####
+###################
+gse42568 <- getGEO("GSE42568", destdir = "C:/Users/MHR/Desktop/Breast")[[1]]
+gse61304 <- getGEO("GSE61304", destdir = "C:/Users/MHR/Desktop/Breast")[[1]]
 
-phen_list <- lapply(gse_list, pData)
-feat_list <- lapply(gse_list, fData)
-expr_list <- lapply(gse_list, function(gse) log2(exprs(gse)))
+phen42568 <- pData(gse42568)
+phen61304 <- pData(gse61304)
 
-commonGenes <- Reduce(intersect, lapply(feat_list, function(f) f$`Gene Symbol`))
+feat42568 <- fData(gse42568)
+feat61304<- fData(gse61304)
 
-editSymbol <- function(featData) {
-  featData$`Gene Symbol` <- sapply(strsplit(featData$`Gene Symbol`, " /// "), function(x) x[x %in% commonGenes][1])
-  featData <- featData[!duplicated(featData$`Gene Symbol`) & featData$`Gene Symbol` != "", c("ID", "Gene Symbol")]
-  colnames(featData) <- c("ID", "symbol")
-  featData
+# Expression data
+expr42568 <- exprs(gse42568)
+expr61304 <- log2(exprs(gse61304))
+expr61304 <- na.omit(expr61304)
+
+
+# Find common genes
+commonGenes <- Reduce(intersect, list(feat42568$`Gene Symbol`, 
+                                      feat61304$`Gene Symbol`))
+
+editSymbol <- function(featData, geneColName) {
+  rows <- which(unlist(lapply(strsplit(featData[,geneColName], " /// "), function(x) ifelse(length(x) > 1, TRUE, FALSE))))
+  for(x in rows) {
+    ss <- strsplit(featData[,geneColName][x], " /// ")[[1]]
+    idx <- which(ss %in% commonGenes)[1]
+    featData[,geneColName][x] <- ss[idx[1]]
+  }
+  return(featData)
 }
 
-feat_list <- lapply(feat_list, editSymbol)
-expr_list <- Map(function(e, f) merge(f, as.data.frame(cbind(ID = rownames(e), e)), by = "ID"), expr_list, feat_list)
-expr_list <- lapply(expr_list, function(e) {
-  rownames(e) <- e$symbol
-  e <- e[, -c(1, 2)]
-  na.omit(e)
-})
+colnames(feat42568)
+colnames(feat61304)
 
-lapply(seq_along(expr_list), function(i) write.csv(expr_list[[i]], paste0("expr", c("15471", "71989", "46234")[i], ".csv"), row.names = TRUE))
 
-defineGroup <- function(phen, patternT, patternN) {
-  phen$group <- ifelse(grepl(patternT, phen$source_name_ch1), "T", ifelse(grepl(patternN, phen$source_name_ch1), "N", phen$source_name_ch1))
-  write.csv(data.frame(sample = rownames(phen), group = phen$group), paste0("phen", c("15471", "71989", "46234")[which(phen_list == phen)], ".csv"), row.names = FALSE)
+feat42568 <- feat42568[,c(1,11)]
+colnames(feat42568) <- c("ID", "symbol")
+
+feat61304 <- feat61304[,c(1,11)]
+colnames(feat61304) <- c("ID", "symbol")
+
+
+expr42568 <- cbind(ID=rownames(expr42568), expr42568) %>% as.data.frame()
+expr61304 <- cbind(ID=rownames(expr61304), expr61304) %>% as.data.frame()
+
+
+expr42568  <- merge(feat42568 , expr42568 , by = "ID")
+expr61304 <- merge(feat61304, expr61304, by = "ID")
+
+expr42568 <- expr42568[which(expr42568$symbol != ""),]
+expr61304 <- expr61304[which(expr61304$symbol != ""),]
+
+
+expr42568  <- expr42568 [!duplicated(expr42568 $symbol),]
+expr61304 <- expr61304[!duplicated(expr61304$symbol),]
+
+rownames(expr42568) <- expr42568$symbol
+rownames(expr61304) <- expr61304$symbol
+
+
+expr42568  <- expr42568 [,-c(1,2)]
+expr61304 <- expr61304[, -c(1,2)]
+
+
+expr42568 <- na.omit(expr42568)
+expr61304  <- na.omit(expr61304)
+
+write.csv(expr42568, "expr42568.csv")
+write.csv(expr61304, "expr61304.csv")
+
+#### Identifying biological classes ####
+########################################
+
+for(x in 1:nrow(phen42568)) {
+  if(grepl("normal", phen42568$source_name_ch1[x], ignore.case = TRUE)) {
+    phen42568$source_name_ch1[x] <- "N"
+  } else if(grepl("cancer", phen42568$source_name_ch1[x], ignore.case = TRUE)) {
+    phen42568$source_name_ch1[x] <- "T"
+  }
 }
 
-defineGroup(phen_list[[1]], "T", "N")
-defineGroup(phen_list[[2]], "Tissue from PDAC patients", "human normal pancreatic tissue")
-defineGroup(phen_list[[3]], "PDAC pancreas", "Normal pancreas")
 
-expr_list <- lapply(seq_along(expr_list), function(i) {
-  expr <- as.data.frame(fread(paste0("expr", c("15471", "71989", "46234")[i], ".csv")))
-  rownames(expr) <- expr$V1; expr <- expr[, -1]
-  expr[Reduce(intersect, lapply(expr_list, rownames)), ]
-})
-expr_list <- lapply(expr_list, function(e) as.data.frame(t(e)))
+for(x in 1:nrow(phen61304)) {
+  if(grepl("normal", phen61304$source_name_ch1[x], ignore.case = TRUE)) {
+    phen61304$source_name_ch1[x] <- "N"  
+  } else if(grepl("tumor", phen61304$source_name_ch1[x], ignore.case = TRUE)) {
+    phen61304$source_name_ch1[x] <- "T"  
+  }
+}
 
-phen_list <- lapply(seq_along(phen_list), function(i) {
-  phen <- as.data.frame(fread(paste0("phen", c("15471", "71989", "46234")[i], ".csv"), header = TRUE))
-  expr <- cbind(sample = rownames(expr_list[[i]]), expr_list[[i]])
-  expr <- merge(phen, expr, by = "sample")
-  rownames(expr) <- expr$sample; expr[, -1]
-})
 
-expr_list <- Map(function(e, b) cbind(batch = b, e), phen_list, 1:3)
-mergedExpr <- do.call(rbind, expr_list)
-mergedExpr$group <- as.numeric(factor(mergedExpr$group, levels = c("N", "T")))
-mergedExpr[, 3:ncol(mergedExpr)] <- lapply(mergedExpr[, 3:ncol(mergedExpr)], as.numeric)
+phen42568_ <- as.data.frame(cbind(sample=rownames(phen42568), group=phen42568[,8]))
+write.csv(phen42568_, "phen42568.csv")
+
+phen61304_ <- as.data.frame(cbind(sample=rownames(phen61304), group=phen61304[,8]))
+write.csv(phen61304_, "phen61304.csv")
+
+
+#### Load expression data ####
+##############################
+
+expr42568 <- as.data.frame(fread("expr42568.csv"))
+rownames(expr42568) <- expr42568$V1
+expr42568 <- expr42568[,-1]
+
+expr61304 <- as.data.frame(fread("expr61304.csv"))
+rownames(expr61304) <- expr61304$V1
+expr61304 <- expr61304[,-1]
+
+
+
+intersectSymbol <- Reduce(intersect, 
+                          list(
+                            rownames(expr42568),
+                            rownames(expr61304)))
+
+expr42568<- expr42568[intersectSymbol,]
+expr61304 <- expr61304[intersectSymbol,]
+
+
+expr42568 <- t(expr42568) %>% as.data.frame()
+expr61304 <- t(expr61304) %>% as.data.frame()
+
+
+#### Load phenotypic data ####
+##############################
+phen42568<- as.data.frame(fread("phen42568.csv", header = TRUE))
+phen42568 <- phen42568[,-1]
+expr42568 <- cbind(sample=rownames(expr42568), expr42568)
+expr42568 <- merge(phen42568, expr42568, by="sample")
+rownames(expr42568) <- expr42568$sample
+expr42568 <- expr42568[,-1]
+
+phen61304<- as.data.frame(fread("phen61304.csv", header = TRUE))
+phen61304 <- phen61304[,-1]
+expr61304<- cbind(sample=rownames(expr61304), expr61304)
+expr61304 <- merge(phen61304, expr61304, by="sample")
+rownames(expr61304) <- expr61304$sample
+expr61304 <- expr61304[,-1]
+
+
+#### Merging datasets ####
+##########################
+expr42568<- cbind(batch=rep(1, nrow(expr42568)), expr42568)
+expr61304 <- cbind(batch=rep(2, nrow(expr61304)), expr61304)
+
+
+mergedExpr <- rbind(expr42568, expr61304)
+mergedExpr$group <- as.factor(mergedExpr$group)
+levels(mergedExpr$group) <- c(1,2)
+mergedExpr$group <- as.numeric(mergedExpr$group)
+
+for(x in 3:ncol(mergedExpr)) mergedExpr[,x] <- as.numeric(mergedExpr[,x])
+
 write.csv(mergedExpr, "mergeDatasets.csv")
+
