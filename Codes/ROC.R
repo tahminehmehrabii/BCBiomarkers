@@ -4,7 +4,7 @@ library(data.table)
 set.seed(123)
 
 # Set the current working directory to the project path
-setwd("C:/Users/MHR/Desktop/PDAC")
+setwd("C:/Users/MHR/Desktop/Breast")
 
 #### ROC curve function ####
 ############################
@@ -38,7 +38,7 @@ rocCurve <- function(data, genes, path, mfrow, auc.x, auc.y, w, h) {
            # box.lwd = 0.1,
            # box.lty = 2,
            cex = 1.5
-           )
+    )
   }
   dev.off()
 }
@@ -80,3 +80,7 @@ data <- list(train, valid)
 
 rocCurve(data, biomarkers, "ROC_.png", c(3, 4), 0.78, 0.50, 3600, 2680)
 rocCurve(data, biomarkers[-c(3,5)], "ROC.png", c(3, 3), 0.78, 0.50, 3400, 3400)
+
+# Save processed datasets to CSV
+fwrite(train, "training_data.csv", row.names = FALSE)
+fwrite(valid, "validation_data.csv", row.names = FALSE)
