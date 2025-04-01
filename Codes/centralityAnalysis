@@ -5,7 +5,7 @@ library(ggraph)
 library(graphlayouts)
 
 # Set the current working directory to the project path
-setwd("C:/Users/MHR/Desktop/PDAC")
+setwd("C:/Users/MHR/Desktop/Breast")
 
 #### Centrality measure analysis ####
 #####################################
@@ -74,3 +74,4 @@ cnt <- rownames(as.data.frame(cnt))
 # Save essential nodes based on the specific centrality measure
 write.table(cnt, file = "essentialNodes.txt", quote = F, row.names = F, col.names = F)
 #####################################
+
