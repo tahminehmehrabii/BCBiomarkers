@@ -2,94 +2,245 @@ library(data.table)
 library(RColorBrewer)
 library(ggplot2)
 library(sva)
+library(preprocessCore)
 
 # Set the current working directory to the project path
-setwd("C:/Users/MHR/Desktop/PDAC")
+setwd("C:/Users/MHR/Desktop/Breast")
 
-# Load data
-load_data <- function(file_path) {
-  data <- as.data.frame(fread(file_path))
-  rownames(data) <- data$V1
-  data <- data[,-1]
-  list(
-    data = data[,-c(1,2)],
-    batch = data$batch,
-    group = data$group,
-    batch_group = data[, c(1,2)]
-  )
-}
+#### Load data ####
+###################
+training_set <- as.data.frame(fread("training_set.csv"))
+validation_set <- as.data.frame(fread("validation_set.csv"))
 
-training <- load_data("training_set.csv")
-validation <- load_data("validation_set.csv")
+rownames(training_set) <- training_set$V1
+rownames(validation_set) <- validation_set$V1
 
-# Prepare variables
-grps <- c("GSE71989", "GSE46234", "GSE15471")
+training_set <- training_set[,-1]
+validation_set <- validation_set[,-1]
+
+train_batch <- training_set$batch
+valid_batch <- validation_set$batch
+
+train_group <- training_set$group
+valid_group <- validation_set$group
+
+train_batch_group <- training_set[,c(1,2)]
+valid_batch_group <- validation_set[,c(1,2)]
+
+train_batch_group <- cbind(sample=rownames(training_set), train_batch_group)
+valid_batch_group <- cbind(sample=rownames(validation_set), valid_batch_group)
+
+training_data <- data.matrix(training_set[,-c(1,2)])
+validation_data <- data.matrix(validation_set[,-c(1,2)])
+
+###################
+
+#### Set parameters ####
+########################
+theme <- theme(strip.text.y = element_text(),
+               axis.text = element_text(colour = "black", size=15),
+               axis.title.x = element_text(colour = "black", face="bold", size=15),
+               axis.title.y = element_text(colour = "black", face="bold", size=15),
+               axis.text.x = element_text(colour = "black", size=15),
+               legend.background = element_rect(fill = "white"),
+               panel.grid.major = element_line(colour = "white"),
+               legend.title=element_text(colour="black",size=15),
+               legend.text=element_text(colour="black",size=15),
+               strip.text.x = element_text(colour = "black", size = 15),
+               plot.title=element_text(size=15, face="bold",hjust=.5,margin=margin(b=2,unit="pt")),
+               panel.border=element_rect(colour="black",size=2),
+               legend.key=element_blank())
+
+values <- sort(brewer.pal(n=5,name="Dark2")[1:5])
+
+grps <- c("GSE42568", "GSE61304")
+
 type <- c("Normal", "Tumor")
-colors <- brewer.pal(n = 5, name = "Dark2")[1:3]
+########################
 
-# PCA function
-run_pca <- function(data, batch, group, type_labels, grps_labels, colors, file_prefix) {
-  pca_result <- prcomp(data, scale = FALSE, center = TRUE)
-  pca_var_per <- round(pca_result$sdev^2 / sum(pca_result$sdev^2) * 100, 2)
-  
-  pc1 <- pca_result$x[,1]
-  pc2 <- pca_result$x[,2]
-  
-  sdat <- data.frame(x = pc1, y = pc2, batch = grps_labels[batch])
-  tdat <- data.frame(sdat[,1:2], grps_labels[batch], type_labels[group])
-  
-  colnames(tdat) <- c("PC-1", "PC-2", "Batch", "Group")
-  rownames(tdat) <- rownames(data)
-  write.table(tdat, paste0(file_prefix, "_pca.txt"), quote = TRUE, sep = "\t", row.names = TRUE)
-  
-  clrs <- c(rep(colors[1], length(which(batch == 1))),
-            rep(colors[2], length(which(batch == 2))),
-            rep(colors[3], length(which(batch == 3))))
-  
-  png(paste0(file_prefix, "_pca.png"), width = 2600, height = 2000, res = 300)
-  ggplot(data = sdat, aes(x, y, colour = batch)) +
-    geom_point(aes(shape = factor(type_labels[group])), size = 5.5, alpha = .7) +
-    labs(title = "", x = paste0("PC1: ", pca_var_per[1], "% variance"), 
-         y = paste0("PC2: ", pca_var_per[2], "% variance")) +
-    scale_shape_manual(values = c(15, 16)) +
-    scale_colour_manual(labels = grps_labels, values = colors) +
-    theme_bw() +
-    theme(strip.text.y = element_text(), 
-          axis.text = element_text(colour = "black", size = 15),
-          axis.title.x = element_text(colour = "black", face = "bold", size = 15),
-          axis.title.y = element_text(colour = "black", face = "bold", size = 15),
-          axis.text.x = element_text(colour = "black", size = 15),
-          legend.background = element_rect(fill = "white"),
-          panel.grid.major = element_line(colour = "white"),
-          legend.title = element_text(colour = "black", size = 15),
-          legend.text = element_text(colour = "black", size = 15),
-          strip.text.x = element_text(colour = "black", size = 15),
-          plot.title = element_text(size = 15, face = "bold", hjust = .5, margin = margin(b = 2, unit = "pt")),
-          panel.border = element_rect(colour = "black", size = 2),
-          legend.key = element_blank()) +
-    theme(legend.position = "right")  
-  dev.off()
-  
-  return(pca_var_per)
+#### PC figure ####
+###################
+fig <- function(sdat, group, clrs, pca.var.per) {
+  fch=c(15,16)
+  Group=factor(fch[group],labels=type)
+  Batch=clrs
+  ggplot(data=sdat, aes(x, y,colour=Batch)) +
+    geom_point(aes(shape=Group),size=5.5,alpha=.7) +
+    labs(title="",x="PC-1",y="PC-2") +
+    scale_shape_manual(values=fch,guide=guide_legend(override.aes=aes(size=5))) +
+    scale_colour_manual(labels=grps,values=values) +
+    theme_bw() + 
+    xlab(paste0("PC1: ", pca.var.per[1], "% variance")) +
+    ylab(paste0("PC2: ", pca.var.per[2], "% variance")) +
+    theme
 }
+###################
 
-# PCA Before Correction for Training and Validation Sets
-run_pca(training$data, training$batch, training$group, type, grps, colors, "before_correction_training")
-run_pca(validation$data, validation$batch, validation$group, type, grps, colors, "before_correction_validation")
-
-# Correct batch using ComBat
-correct_batch <- function(data, batch, file_prefix) {
-  corrected_data <- ComBat(dat = t(data), batch = batch, mod = NULL, par.prior = TRUE, prior.plots = FALSE)
-  corrected_data_ <- as.data.frame(cbind(sample = rownames(t(corrected_data)), t(corrected_data)))
-  write.table(corrected_data_, paste0(file_prefix, "_corrected.txt"), quote = TRUE, sep = "\t", row.names = TRUE)
-  write.csv(corrected_data_, paste0(file_prefix, "_corrected.csv"))
-  return(corrected_data_)
+#### Calculate the percentage variance ####
+###########################################
+pcaVarPer <- function(pca) {
+  pca.var <- pca$sdev^2
+  pca.var.per <- round(pca.var / sum(pca.var) * 100, 2)
+  return(pca.var.per)
 }
+###########################################
 
-# Correct batches for training and validation sets
-corrected_training <- correct_batch(training$data, training$batch, "corrected_training")
-corrected_validation <- correct_batch(validation$data, validation$batch, "corrected_validation")
 
-# PCA After Correction for Training and Validation Sets
-run_pca(corrected_training, training$batch, training$group, type, grps, colors, "after_correction_training")
-run_pca(corrected_validation, validation$batch, validation$group, type, grps, colors, "after_correction_validation")
+#### PCA before correction for training set ####
+################################################
+pcaBeforeCorrection <- prcomp(training_data, scale=FALSE, center = TRUE)
+
+pca.var.per.before <- pcaVarPer(pcaBeforeCorrection)
+
+pc1 <- pcaBeforeCorrection$x[,1]
+pc2 <- pcaBeforeCorrection$x[,2]
+
+sdat <- data.frame(x=pc1, y=pc2, batch = grps[train_batch])
+tdat <- data.frame(sdat[,1:2], grps[train_batch], type[train_group])
+
+colnames(tdat)<-c("PC-1","PC-2","Batch","Group")
+rownames(tdat)<-rownames(training_data)
+
+write.table(tdat,paste0("pca_Before_Correction_for_training_set.txt"),quote=TRUE,sep="\t",row.names=TRUE)
+
+clrs <- c(
+  rep("#1B9E77",length(which(train_batch == 1))),
+  rep("#666666",length(which(train_batch == 2))), 
+  rep("#66A61E",length(which(train_batch == 3))), 
+  rep("#7570B3",length(which(train_batch == 4))),
+  rep("#A6761D",length(which(train_batch == 5)))
+  # rep("#D95F02",length(which(batchColorectal == 6)))
+)
+
+png("pca_Before_Correction_for_training_set.png", width = 2600, height = 2000, res = 300)
+fig(sdat, train_group, clrs, pca.var.per.before)
+dev.off()
+################################################
+
+#### PCA before correction for validation set ####
+################################################
+pcaBeforeCorrection <- prcomp(validation_data, scale=FALSE, center = TRUE)
+
+pca.var.per.before <- pcaVarPer(pcaBeforeCorrection)
+
+pc1 <- pcaBeforeCorrection$x[,1]
+pc2 <- pcaBeforeCorrection$x[,2]
+
+sdat <- data.frame(x=pc1, y=pc2, batch = grps[valid_batch])
+tdat <- data.frame(sdat[,1:2], grps[valid_batch], type[valid_group])
+
+colnames(tdat)<-c("PC-1","PC-2","Batch","Group")
+rownames(tdat)<-rownames(validation_data)
+
+write.table(tdat,paste0("pca_Before_Correction_for_validation_set.txt"),quote=TRUE,sep="\t",row.names=TRUE)
+
+clrs <- c(
+  rep("#1B9E77",length(which(valid_batch == 1))),
+  rep("#666666",length(which(valid_batch == 2))), 
+  rep("#66A61E",length(which(valid_batch == 3))), 
+  rep("#7570B3",length(which(valid_batch == 4))),
+  rep("#A6761D",length(which(valid_batch == 5)))
+  # rep("#D95F02",length(which(batchColorectal == 6)))
+)
+
+png("pca_Before_Correction_for_validation_set.png", width = 2600, height = 2000, res = 300)
+fig(sdat, valid_group, clrs, pca.var.per.before)
+dev.off()
+################################################
+
+#### Correct batch by ComBat for training set ####
+##################################################
+train_combatres <- ComBat(
+  dat=t(training_data),
+  batch=train_batch,
+  mod=NULL, 
+  par.prior=TRUE, 
+  prior.plots=FALSE
+)
+
+combatres_ <- as.data.frame(cbind(sample=rownames(t(train_combatres)), t(train_combatres)))
+combatres_ <- merge(train_batch_group, combatres_, by="sample")
+
+write.csv(combatres_, "corrected_training_set.csv")
+write.table(combatres_, paste0("corrected_training_set.txt"),quote=TRUE,sep="\t",row.names=TRUE)
+##################################################
+
+#### Correct batch by ComBat for training set ####
+##################################################
+valid_combatres <- ComBat(
+  dat=t(validation_data),
+  batch=valid_batch,
+  mod=NULL, 
+  par.prior=TRUE, 
+  prior.plots=FALSE
+)
+
+combatres_ <- as.data.frame(cbind(sample=rownames(t(valid_combatres)), t(valid_combatres)))
+combatres_ <- merge(valid_batch_group, combatres_, by="sample")
+
+write.csv(combatres_, "corrected_validation_set.csv")
+write.table(combatres_, paste0("corrected_validation_set.txt"),quote=TRUE,sep="\t",row.names=TRUE)
+##################################################
+
+#### PCA on combat batch corrected for training set ####
+########################################################
+pcaAfterCorrection <- prcomp(t(train_combatres), scale=FALSE, center = TRUE)
+
+pca.var.per.after <- pcaVarPer(pcaAfterCorrection)
+
+pc1 <- pcaAfterCorrection$x[,1]
+pc2 <- pcaAfterCorrection$x[,2]
+
+sdat <- data.frame(x=pc1, y=pc2, batch = grps[train_batch])
+tdat <- data.frame(sdat[,1:2], grps[train_batch], type[train_group])
+
+colnames(tdat)<-c("PC-1","PC-2","Batch","Group")
+rownames(tdat)<-rownames(training_data)
+
+write.table(tdat,paste0("pca_After_Correction_for_training_set.txt"),quote=TRUE,sep="\t",row.names=TRUE)
+
+clrs <- c(
+  rep("#1B9E77",length(which(train_batch == 1))),
+  rep("#666666",length(which(train_batch == 2))), 
+  rep("#66A61E",length(which(train_batch == 3))), 
+  rep("#7570B3",length(which(train_batch == 4))),
+  rep("#A6761D",length(which(train_batch == 5)))
+  # rep("#D95F02",length(which(batchColorectal == 6)))
+)
+
+png("pca_After_Correction_training_set.png", width = 2600, height = 2000, res = 300)
+fig(sdat, train_group, clrs, pca.var.per.after)
+dev.off()
+########################################################
+
+
+#### PCA on combat batch corrected for validation set ####
+##########################################################
+pcaAfterCorrection <- prcomp(t(valid_combatres), scale=FALSE, center = TRUE)
+
+pca.var.per.after <- pcaVarPer(pcaAfterCorrection)
+
+pc1 <- pcaAfterCorrection$x[,1]
+pc2 <- pcaAfterCorrection$x[,2]
+
+sdat <- data.frame(x=pc1, y=pc2, batch = grps[valid_batch])
+tdat <- data.frame(sdat[,1:2], grps[valid_batch], type[valid_group])
+
+colnames(tdat)<-c("PC-1","PC-2","Batch","Group")
+rownames(tdat)<-rownames(validation_data)
+
+write.table(tdat,paste0("pca_After_Correction_for_validation_set.txt"),quote=TRUE,sep="\t",row.names=TRUE)
+
+clrs <- c(
+  rep("#1B9E77",length(which(valid_batch == 1))),
+  rep("#666666",length(which(valid_batch == 2))), 
+  rep("#66A61E",length(which(valid_batch == 3))), 
+  rep("#7570B3",length(which(valid_batch == 4))),
+  rep("#A6761D",length(which(valid_batch == 5)))
+  # rep("#D95F02",length(which(batchColorectal == 6)))
+)
+
+png("pca_After_Correction_validation_set.png", width = 2600, height = 2000, res = 300)
+fig(sdat, valid_group, clrs, pca.var.per.after)
+dev.off()
+##########################################################
