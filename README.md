@@ -1,4 +1,4 @@
-# PDAC-Biomarkers
+# Breast Cancer-Biomarkers
 Overview
 This github repository contains the data files and analysis code used for the scientific paper titled "Integrating machine learning and bioinformatics approaches for identifying novel diagnostic gene biomarkers in Breast cancer". 
 
@@ -8,7 +8,7 @@ Results: contains all the results produced by the R scripts.
 Reproducing the results
 This repository contains all the code necessary to reproduce the results.
 
-git clone https://github.com/tahminehmehrabii/PDAC-Biomarkers.git
+git clone https://github.com/tahminehmehrabii/Breast Cancer-Biomarkers.git
 
 
 1. mergeDatasets.R was executed to merge the microarray datasets based on their common genes.
