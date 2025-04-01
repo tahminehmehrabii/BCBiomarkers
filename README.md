@@ -16,29 +16,41 @@ https://github.com/tahminehmehrabii/BreastCancer-Biomarkers.git
 
 To reproduce the results, the following R scripts were executed:
 
-1. mergeDatasets.R: Merged the microarray datasets based on their common genes.
+## 1. mergeDatasets.R:
+Merged the microarray datasets based on their common genes.
 
-2. trainValidSplit.R: Split the merged datasets into training and validation datasets.
+## 2. trainValidSplit.R: 
+Split the merged datasets into training and validation datasets.
 
-3. batchCorrection.R: Corrected batch effects in both the training and validation datasets.
+## 3. batchCorrection.R: 
+Corrected batch effects in both the training and validation datasets.
 
-4. differentialExpressionAnalysis.R: Identified differentially expressed genes (DEGs) in the training dataset.
+## 4. differentialExpressionAnalysis.R: 
+Identified differentially expressed genes (DEGs) in the training dataset.
 
-5. enrichmentAnalysis.R: Provided insights into the biological significance of the DEGs.
+## 5. enrichmentAnalysis.R: 
+Provided insights into the biological significance of the DEGs.
 
-6. geneCoexpressionAnalysis.R: Constructed co-expression modules in the training dataset using the CEMiTool package with default settings.
+## 6. geneCoexpressionAnalysis.R: 
+Constructed co-expression modules in the training dataset using the CEMiTool package with default settings.
 
-7. overlappedGenes.R: Identified genes that overlapped between the DEGs and the most significant module found by CEMiTool.
+## 7. overlappedGenes.R: 
+Identified genes that overlapped between the DEGs and the most significant module found by CEMiTool.
 
-8. centralityAnalysis.R: Identified key genes in the protein-protein interaction (PPI) network.
+## 8. centralityAnalysis.R: 
+Identified key genes in the protein-protein interaction (PPI) network.
 
-9. LASSO.R: Selected candidate diagnostic genes from the key genes in the training dataset.
+## 9. LASSO.R: 
+Selected candidate diagnostic genes from the key genes in the training dataset.
 
-10. ROC.R: Evaluated the sensitivity and specificity of the candidate diagnostic genes in both the training and validation datasets.
+## 10. ROC.R: 
+Evaluated the sensitivity and specificity of the candidate diagnostic genes in both the training and validation datasets.
 
-11. trainEvaluateML.R: Verified the accuracy of diagnostic genes in distinguishing between normal and tumor samples using machine learning models.
+## 11. trainEvaluateML.R: 
+Verified the accuracy of diagnostic genes in distinguishing between normal and tumor samples using machine learning models.
 
-12. SignallingAnalysis.R: Assessed signaling pathways in breast cancer (BC) and analyzed the correlation between biomarkers and these pathways.
+## 12. SignallingAnalysis.R: 
+Assessed signaling pathways in breast cancer (BC) and analyzed the correlation between biomarkers and these pathways.
 
 
 
