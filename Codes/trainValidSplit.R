@@ -1,30 +1,25 @@
 library(data.table)
 
-setwd("C:/Users/MHR/Desktop/PDAC")
+setwd("C:/Users/MHR/Desktop/Breast")
 
-samples <- fread("mergeDatasets.csv")
-samples <- samples[, -1, with = FALSE]
+samples <- as.data.frame(fread("mergeDatasets.csv"))
 rownames(samples) <- samples$V1
+samples <- samples[,-1]
 
-# Sample assignment
-split_samples <- function(group) {
-  samples_group <- rownames(samples)[samples$group == group]
-  training <- sample(samples_group, ceiling(0.7 * length(samples_group)))
-  validation <- setdiff(samples_group, training)
-  return(list(training = training, validation = validation))
-}
+cancerSamples <- rownames(samples)[which(samples$group == 2)]
+normalSamples <- rownames(samples)[which(samples$group == 1)]
 
-cancerSamples <- split_samples(2)
-normalSamples <- split_samples(1)
+trainingCancerSamples <- cancerSamples[sample(1:length(cancerSamples), ceiling(0.7*length(cancerSamples)))]
+validationCancerSamples <- cancerSamples[-which(cancerSamples %in% trainingCancerSamples)]
 
-# Combine training and validation sets
-trainingSamples <- union(cancerSamples$training, normalSamples$training)
-validationSamples <- union(cancerSamples$validation, normalSamples$validation)
+trainingNormalSamples <- normalSamples[sample(1:length(normalSamples), ceiling(0.7*length(normalSamples)))]
+validationNormalSamples <- normalSamples[-which(normalSamples %in% trainingNormalSamples)]
 
-# Create training and validation sets
-trainingSet <- samples[rownames(samples) %in% trainingSamples, ]
-validationSet <- samples[rownames(samples) %in% validationSamples, ]
+trainingSamples <- union(trainingCancerSamples, trainingNormalSamples)
+validationSamples <- union(validationCancerSamples, validationNormalSamples)
 
-# Save results
+trainingSet <- samples[which(rownames(samples) %in% trainingSamples),]
+validationSet <- samples[which(rownames(samples) %in% validationSamples),]
+
 write.csv(trainingSet, "training_set.csv")
 write.csv(validationSet, "validation_set.csv")
