@@ -52,6 +52,18 @@ Verified the accuracy of diagnostic genes in distinguishing between normal and t
 ## 12. SignallingAnalysis.R: 
 Assessed signaling pathways in breast cancer (BC) and analyzed the correlation between biomarkers and these pathways.
 
+# Required software
+
+. R (4.4.2)
+. RStudio version: 2024.12.0
+. GEOquery (2.74.0)
+. org.Hs.eg.db (3.20.0)
+. EnsDb.Hsapiens.v79 (2.99.0)
+. ggplot2 (3.5.1)
+. sva (3.54.0)
+. igraph (2.1.4)
+. CINNA (1.2.2)
+
 
 
 
