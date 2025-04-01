@@ -1,40 +1,61 @@
 library(data.table)
-if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
-BiocManager::install("CEMiTool")
 library(CEMiTool)
 
-# Set working directory
-setwd("C:/Users/MHR/Desktop/PDAC")
+# Set the current working directory to the project path
+setwd("C:/Users/MHR/Desktop/Breast")
 
 #### Load and process data ####
-trainingSet <- fread("corrected_training_set.csv")
-exprData <- t(trainingSet[, -c(1:4)])
-phenData <- gsub(1, "Normal", gsub(2, "Tumor", trainingSet$group))
-rownames(exprData) <- trainingSet$sample
-write.csv(exprData, paste0("GeneExpressionProfileOf", ncol(exprData), "Samples.csv"), quote = F)
-write.csv(data.frame(ID = colnames(exprData), Group = phenData), 
-          paste0("DiseasePhenotypesOf", ncol(exprData), "Samples.csv"), quote = F)
+###############################
+trainingSet <- as.data.frame(fread("corrected_training_set.csv"))
+exprData <- trainingSet
+phenData <- trainingSet$group
+gmtData <- read_gmt(system.file("extdata", "pathways.gmt", package = "CEMiTool"))
+intData <- read.delim(system.file("extdata", "interactions.tsv", package = "CEMiTool"))
+rownames(exprData) <- exprData$sample
+exprData <- exprData[,-c(1:4)]
+exprData <- as.data.frame(t(exprData))
+write.csv(exprData, file = paste0("GeneExpressionProfileOf",ncol(exprData),"Samples.csv"), quote = F, row.names = T)
 
-#### WGCNA using CEMiTool ####
-cem <- cemitool(expr = exprData, annot = data.frame(ID = colnames(exprData), Group = phenData),
-                gmt = read_gmt(system.file("extdata", "pathways.gmt", package = "CEMiTool")),
-                interactions = read.delim(system.file("extdata", "interactions.tsv", package = "CEMiTool")),
-                sample_name_column = "ID", class_column = "Group", plot = TRUE, verbose = TRUE)
+phenData <- data.frame(ID=colnames(exprData), Group=phenData)
+phenData$Group <- gsub(1, "Normal", phenData$Group)
+phenData$Group <- gsub(2, "Tumor", phenData$Group)
 
-# Generate report, tables, and plots
-generate_report(cem, directory = "geneCoexpressionAnalysis/Report", force = TRUE, output_format = "html_document")
-write_files(cem, directory = "geneCoexpressionAnalysis/Tables", force = TRUE)
-save_plots(cem, value = c("all"), force = TRUE, directory = "geneCoexpressionAnalysis/Plots")
+write.csv(phenData, file = paste0("DiseasePhenotypesOf",ncol(exprData),"Samples.csv"), quote = F, row.names = T)
+###############################
 
-# Save specific plots
-plots <- c("beta_r2", "mean_k", "gsea", "ora_M1")
-for (plot in plots) {
-  png(paste0("geneCoexpressionAnalysis/", plot, ".png"), height = 1600, width = 1600, res = 300)
-  show_plot(cem, plot)
-  dev.off()
-}
+#### WGCNA using CEMiTool package ####
+######################################
+cem <- cemitool(expr = exprData, 
+                annot = phenData,
+                gmt = gmtData,
+                interactions = intData,
+                sample_name_column = "ID", 
+                class_column = "Group",
+                plot = TRUE,
+                verbose = TRUE
+)
 
-# Save significant genes
-sigGenes <- fread("geneCoexpressionAnalysis/Tables/module.tsv")$genes
-write.table(sigGenes[which(fread("geneCoexpressionAnalysis/Tables/module.tsv")$modules == "M1")], 
-            "geneCoexpressionAnalysis/modulesGenes.txt", quote = FALSE, row.names = FALSE, col.names = FALSE)
+generate_report(cem, directory = "Report", force = T, output_format = "html_document")
+write_files(cem, directory = "Tables", force = T)
+save_plots(cem, value = c("all"), force = T, directory = "Plots")
+
+png("beta_r2.png", height = 1600, width = 1600, res = 300)
+show_plot(cem, "beta_r2")
+dev.off()
+
+png("mean_k.png", height = 1600, width = 1600, res = 300)
+show_plot(cem, "mean_k")
+dev.off()
+
+png("gsea.png", height = 1600, width = 1600, res = 300)
+show_plot(cem, "gsea")
+dev.off()
+
+png("ora_M1.png", height = 1600, width = 1600, res = 300)
+show_plot(cem, "ora")$M1
+dev.off()
+
+mods <- fread("module.tsv")
+sigMods <- c("M1")
+sigGenes <- mods$genes[which(mods$modules %in% sigMods)]
+write.table(sigGenes, "modulesGenes.txt", quote = FALSE, row.names = FALSE, col.names = FALSE)
