@@ -79,8 +79,31 @@ Assessed signaling pathways in breast cancer (BC) and analyzed the correlation b
 23. preprocessCore (1.68.0)
 24. dplyr (1.1.4)
 25. annotate (1.84.0)
+26. forcats (1.0.0)
+27. ggpubr (0.6.0)
+28. readr (2.1.5)
+29. graphlayouts (1.2.2)
+30. enrichplot (1.26.6)
+31. AnnotationDbi (1.68.0)
+32. ggvenn (0.1.10)
+33. ggrepel (0.9.6)
+34. neuralnet (1.44.2)
+35. nnet (7.3.20)
+36. NeuralNetTools (1.5.3)
+37. h2o (3.44.0.3)
 
-26. ر
+
+
+
+
+
+
+
+
+
+
+
+27. ر
 
 
 
