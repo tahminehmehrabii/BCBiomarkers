@@ -10,6 +10,8 @@ This repository contains all the code necessary to reproduce the results.
 
 https://github.com/tahminehmehrabii/BreastCancer-Biomarkers.git
 
+# Reproducing the results
+
 1. mergeDatasets.R was executed to merge the microarray datasets based on their common genes.
 
 2. trainValidSplit.R was executed to split the merged datasets into training and validation datasets.
