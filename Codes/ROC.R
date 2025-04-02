@@ -7,7 +7,6 @@ set.seed(123)
 setwd("C:/Users/MHR/Desktop/Breast")
 
 #### ROC curve function ####
-############################
 rocCurve <- function(data, genes, path, mfrow, auc.x, auc.y, w, h) {
   png(filename = path, width = w, height = h, res = 300)
   par(mfrow=mfrow)
@@ -15,17 +14,11 @@ rocCurve <- function(data, genes, path, mfrow, auc.x, auc.y, w, h) {
     roc.train <- roc(as.formula(paste("group ~", g)), data = data[[1]], auc = TRUE, ci = TRUE)
     roc.valid <- roc(as.formula(paste("group ~", g)), data = data[[2]], auc = TRUE, ci = TRUE)
     plot.roc(roc.train, 
-             # print.auc = T, 
              col = "#1F77B4",
-             # ci = T,
-             # print.auc.pattern = "       AUC: %.3f \n95%% CI: %.3f-%.3f",
-             # print.auc.x = auc.x,
-             # print.auc.y = auc.y,
              legacy.axes = FALSE,
              main = g,
              cex.main = 1.3,
              lwd = 2.3,
-             # print.auc.cex = 1.3,
              cex.lab = 1.4
     )
     lines(roc.valid, col="salmon")
@@ -35,51 +28,48 @@ rocCurve <- function(data, genes, path, mfrow, auc.x, auc.y, w, h) {
            col=c("#1F77B4", "salmon"),
            lty = 1,
            lwd = 2.2,
-           # box.lwd = 0.1,
-           # box.lty = 2,
            cex = 1.5
     )
   }
   dev.off()
 }
-############################
 
 biomarkers <- fread("lassoGenes.txt", header = FALSE)$V1
 biomarkers <- sort(biomarkers)
 
 #### ROC curve for train data ####
-##################################
 trainingSet <- as.data.frame(fread("corrected_training_set.csv"))
-
 rownames(trainingSet) <- trainingSet$sample
 group <- trainingSet$group
 group <- as.factor(group)
 levels(group) <- c("Normal", "Tumor")
 trainingSet <- trainingSet[,-c(1:4)]
-
 trainingSet <- trainingSet[, biomarkers]
 train <- cbind(group=group, trainingSet)
-##################################
 
 #### ROC curve for testing data ####
-####################################
 validSet <- as.data.frame(fread("corrected_validation_set.csv"))
-
 rownames(validSet) <- validSet$sample
-
 group <- validSet$group
 group <- as.factor(group)
 levels(group) <- c("Normal", "Tumor")
 validSet <- validSet[,-c(1:4)]
-
 validSet <- validSet[, biomarkers]
 valid <- cbind(group=group, validSet)
-####################################
 
 data <- list(train, valid)
 
-rocCurve(data, biomarkers, "ROC_.png", c(3, 4), 0.78, 0.50, 3600, 2680)
-rocCurve(data, biomarkers[-c(3,5)], "ROC.png", c(3, 3), 0.78, 0.50, 3400, 3400)
+# Filter genes with AUC > 0.9 in both sets
+selected_genes <- biomarkers[sapply(biomarkers, function(g) {
+  roc.train <- roc(as.formula(paste("group ~", g)), data = data[[1]], auc = TRUE, ci = TRUE)
+  roc.valid <- roc(as.formula(paste("group ~", g)), data = data[[2]], auc = TRUE, ci = TRUE)
+  (roc.train$auc > 0.9) & (roc.valid$auc > 0.9)
+})]
+
+# Run ROC curve function for selected genes
+rocCurve(data, selected_genes, "Filtered_ROC.png", c(3, 3), 0.78, 0.50, 3400, 3400)
+
+
 
 # Save processed datasets to CSV
 fwrite(train, "training_data.csv", row.names = FALSE)
