@@ -1,4 +1,4 @@
-# BreastCancer-Biomarkers
+# Colorectal Cancer Biomarkers: A Machine Learning and RNA-Seq Bioinformatics Study
 # Overview
 This GitHub repository contains the data files and analysis code used in the scientific paper titled "Integrating Machine Learning and Bioinformatics Approaches for Identifying Novel Diagnostic Gene Biomarkers in Breast Cancer".
 
