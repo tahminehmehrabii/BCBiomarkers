@@ -1,5 +1,7 @@
 library(data.table)
 library(CEMiTool)
+library(fgsea)
+packageVersion("fgsea")
 
 # Set the current working directory to the project path
 setwd("C:/Users/MHR/Desktop/Breast")
