@@ -13,7 +13,7 @@ Results: contains all the results produced by the R scripts.
 To reproduce the results, the following R scripts were executed:
 
 ## 1. mergeDatasets.R:
-Merged the microarray datasets based on their common genes.
+Merged the microarray datasets(GSE10950, GSE25070) based on their common genes.
 
 ## 2. trainValidSplit.R: 
 Split the merged datasets into training and validation datasets.
