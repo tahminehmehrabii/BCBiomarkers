@@ -1,4 +1,4 @@
-# Breast Cancer Biomarkers
+# A Bioinformatics and Machine Learning Pipeline for Discovering Diagnostic Gene Biomarkers in Breast Cancer
 
 # Overview
 This github repository contains the data files and analysis code used for the scientific Project titled "Integrating machine learning and bioinformatics approaches for identifying novel diagnostic gene biomarkers in Breast cancer". The files are organized into four folders:
@@ -7,46 +7,21 @@ Data: which contains all the transcriptomic data required to perform the analyse
 Codes: contains the R scripts to reproduce all analyses.
 Results: contains all the results produced by the R scripts.
 
-
 # Reproducing the results
-
 To reproduce the results, the following R scripts were executed:
 
-## 1. mergeDatasets.R:
-Merged the microarray datasets(GSE10950, GSE25070) based on their common genes.
-
-## 2. trainValidSplit.R: 
-Split the merged datasets into training and validation datasets.
-
-## 3. batchCorrection.R: 
-Corrected batch effects in both the training and validation datasets.
-
-## 4. differentialExpressionAnalysis.R: 
-Identified differentially expressed genes (DEGs) in the training dataset.
-
-## 5. enrichmentAnalysis.R: 
-Provided insights into the biological significance of the DEGs.
-
-## 6. geneCoexpressionAnalysis.R: 
-Constructed co-expression modules in the training dataset using the CEMiTool package with default settings.
-
-## 7. overlappedGenes.R: 
-Identified genes that overlapped between the DEGs and the most significant module found by CEMiTool.
-
-## 8. centralityAnalysis.R: 
-Identified key genes in the protein-protein interaction (PPI) network.
-
-## 9. LASSO.R: 
-Selected candidate diagnostic genes from the key genes in the training dataset.
-
-## 10. ROC.R: 
-Evaluated the sensitivity and specificity of the candidate diagnostic genes in both the training and validation datasets.
-
-## 11. trainEvaluateML.R: 
-Verified the accuracy of diagnostic genes in distinguishing between normal and tumor samples using machine learning models.
-
-## 12. SignallingAnalysis.R: 
-Assessed signaling pathways in breast cancer (BC) and analyzed the correlation between biomarkers and these pathways.
+1. Run mergeDatasets.R to merge the five microarray datasets (GSE42568, GSE61304) based on their common genes.
+2. Run trainValidSplit.R to split merged datasets into training and validation datasets.
+3. Run batchCorrection.R to correct batch effects for training and validation datasets.
+4. Run differentialExpressionAnalysis.R to identify differentially expressed genes (DEGs) on the training dataset.
+5. Run enrichmentAnalysis.R to gain a deeper insight into the biological significance of the DEGs.
+6. Run geneCoexpressionAnalysis.R to construct co-expression modules on the training dataset using the automatic network construction package CEMiTool with default settings.
+7. Run overlappedGenes.R to identify genes overlapped between DEGs and genes within the most significant module identified by CEMiTool.
+8. Run centralityAnalysis.R to identify key genes in the protein-protein interaction (PPI) network.
+9. Run LASSO.R to identify candidate diagnostic genes from within the set of key genes on the training dataset.
+10. Run ROC.R to evaluate the sensitivity and specificity of candidate diagnostic genes on both the training and validation datasets.
+11. Run trainEvaluateML.R to verify the accuracy of diagnostic genes in distinguishing between normal and tumor samples using two machine learning models, namely, RF and SVM.
+12. Run immuneAnalysis.R to assess immune cell infiltration in BC and the correlation between biomarkers and immune cells.
 
 # Required software
 
