@@ -243,4 +243,23 @@ clrs <- c(
 png("pca_After_Correction_validation_set.png", width = 2600, height = 2000, res = 300)
 fig(sdat, valid_group, clrs, pca.var.per.after)
 dev.off()
+
+
+
 ##########################################################
+library(gridExtra)
+library(grid)
+
+# بارگیری تصاویر
+img1 <- rasterGrob(as.raster(png::readPNG("pca_Before_Correction_for_training_set.png")), interpolate=TRUE)
+img2 <- rasterGrob(as.raster(png::readPNG("pca_Before_Correction_for_validation_set.png")), interpolate=TRUE)
+img3 <- rasterGrob(as.raster(png::readPNG("pca_After_Correction_training_set.png")), interpolate=TRUE)
+img4 <- rasterGrob(as.raster(png::readPNG("pca_After_Correction_validation_set.png")), interpolate=TRUE)
+
+png("combined_PCA_plots.png", width = 5200, height = 4000, res = 300)
+grid.arrange(img1, img2, img3, img4, ncol=2, nrow=2,
+             top=textGrob("Comparison of PCA Before and After Batch Correction", gp=gpar(fontsize=20, fontface="bold")))
+dev.off()
+
+###########################
+
