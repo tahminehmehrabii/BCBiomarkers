@@ -1,5 +1,6 @@
-GSE71989: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE71989
-GSE46234: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46234
-GSE15471: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=gse15471
-GSE22780: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=gse22780
-GSE16515: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=gse16515
+Training and Validation set:
+GSE42568: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE42568
+GSE61304: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE61304
+
+Independent test set:
+GSE29431: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE29431
