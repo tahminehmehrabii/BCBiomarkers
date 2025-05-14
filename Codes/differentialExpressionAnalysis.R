@@ -100,7 +100,7 @@ volcano_plot <- ggplot(tT, aes(x = logFC, y = -log10(P.Value), color = threshold
                   box.padding = 0.4,
                   point.padding = 0.3,
                   segment.color = "grey50",
-                  color = "black")    # رنگ برچسب‌ها مشکی
+                  color = "black")    
 
 # Show plot
 print(volcano_plot)
@@ -129,7 +129,7 @@ ann_colors <- list(
 # Draw a heatmap and save it as a PNG file
 heatmap_plot <- pheatmap(trainingSet,
                          annotation_col = group_info,
-                         annotation_row = group_info,  # در صورت تمایل
+                         annotation_row = group_info,  
                          annotation_colors = ann_colors,
                          color = colorRampPalette(c("blue", "white", "red"))(100),
                          cluster_rows = TRUE,
