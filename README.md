@@ -23,6 +23,7 @@ To reproduce the results, the following R scripts were executed:
 11. trainEvaluateML.R was used to verify the ability of the diagnostic genes to distinguish between normal and tumor samples using two machine learning models: Random Forest (RF) and Support Vector Machine (SVM).
 12.immuneAnalysis.R was performed to assess immune cell infiltration in breast cancer and to analyze the correlation between biomarkers and immune cells.
 
+
 # Required software
 1. R (4.4.2)
 2. RStudio version: 2024.12.0
