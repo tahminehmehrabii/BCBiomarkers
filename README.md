@@ -10,21 +10,20 @@ Results: contains all the results produced by the R scripts.
 # Reproducing the results
 To reproduce the results, the following R scripts were executed:
 
-1. Run mergeDatasets.R to merge the five microarray datasets (GSE42568, GSE61304) based on their common genes.
-2. Run trainValidSplit.R to split merged datasets into training and validation datasets.
-3. Run batchCorrection.R to correct batch effects for training and validation datasets.
-4. Run differentialExpressionAnalysis.R to identify differentially expressed genes (DEGs) on the training dataset.
-5. Run enrichmentAnalysis.R to gain a deeper insight into the biological significance of the DEGs.
-6. Run geneCoexpressionAnalysis.R to construct co-expression modules on the training dataset using the automatic network construction package CEMiTool with default settings.
-7. Run overlappedGenes.R to identify genes overlapped between DEGs and genes within the most significant module identified by CEMiTool.
-8. Run centralityAnalysis.R to identify key genes in the protein-protein interaction (PPI) network.
-9. Run LASSO.R to identify candidate diagnostic genes from within the set of key genes on the training dataset.
-10. Run ROC.R to evaluate the sensitivity and specificity of candidate diagnostic genes on both the training and validation datasets.
-11. Run trainEvaluateML.R to verify the accuracy of diagnostic genes in distinguishing between normal and tumor samples using two machine learning models, namely, RF and SVM.
-12. Run immuneAnalysis.R to assess immune cell infiltration in BC and the correlation between biomarkers and immune cells.
+1. mergeDatasets.R was run to merge the five microarray datasets (GSE42568, GSE61304) based on their common genes.
+2. trainValidSplit.R was executed to split the merged datasets into training and validation datasets.
+3. batchCorrection.R was used to correct batch effects in the training and validation datasets.
+4. differentialExpressionAnalysis.R was run to identify differentially expressed genes (DEGs) in the training dataset.
+5. enrichmentAnalysis.R was performed to gain deeper insight into the biological significance of the DEGs.
+6. geneCoexpressionAnalysis.R was executed to construct co-expression modules on the training dataset using the CEMiTool package with default settings.
+7. overlappedGenes.R was used to identify overlapping genes between the DEGs and the genes within the most significant module identified by CEMiTool.
+8. centralityAnalysis.R was run to identify key genes in the protein–protein interaction (PPI) network.
+9. LASSO.R was applied to identify candidate diagnostic genes among the key genes in the training dataset.
+10. ROC.R was executed to evaluate the sensitivity and specificity of the candidate diagnostic genes in both training and validation datasets.
+11. trainEvaluateML.R was used to verify the ability of the diagnostic genes to distinguish between normal and tumor samples using two machine learning models: Random Forest (RF) and Support Vector Machine (SVM).
+12.immuneAnalysis.R was performed to assess immune cell infiltration in breast cancer and to analyze the correlation between biomarkers and immune cells.
 
 # Required software
-
 1. R (4.4.2)
 2. RStudio version: 2024.12.0
 3. GEOquery (2.74.0)
