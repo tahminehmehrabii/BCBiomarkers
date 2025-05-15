@@ -250,7 +250,7 @@ dev.off()
 library(gridExtra)
 library(grid)
 
-# بارگیری تصاویر
+# Loading images
 img1 <- rasterGrob(as.raster(png::readPNG("pca_Before_Correction_for_training_set.png")), interpolate=TRUE)
 img2 <- rasterGrob(as.raster(png::readPNG("pca_Before_Correction_for_validation_set.png")), interpolate=TRUE)
 img3 <- rasterGrob(as.raster(png::readPNG("pca_After_Correction_training_set.png")), interpolate=TRUE)
