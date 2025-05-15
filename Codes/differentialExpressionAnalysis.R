@@ -90,7 +90,7 @@ volcano_plot <- ggplot(tT, aes(x = logFC, y = -log10(P.Value), color = threshold
                   box.padding = 0.4,
                   point.padding = 0.3,
                   segment.color = "grey50",
-                  color = "black") +  # رنگ برچسب‌ها مشکی
+                  color = "black") + 
   
 # Tagging down-regulated genes
   geom_text_repel(data = tT[tT$logFC < -1 & tT$adj.P.Val < 0.05, ][1:10, ],
