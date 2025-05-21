@@ -10,7 +10,7 @@ Results: contains all the results produced by the R scripts.
 # Reproducing the results
 To reproduce the results, the following R scripts were executed:
 
-1. mergeDatasets.R was run to merge the five microarray datasets (GSE42568, GSE61304) based on their common genes.
+1. mergeDatasets.R was run to merge the five microarray datasets (GSE42568 and GSE61304) based on their common genes.
 2. trainValidSplit.R was executed to split the merged datasets into training and validation datasets.
 3. batchCorrection.R was used to correct batch effects in the training and validation datasets.
 4. differentialExpressionAnalysis.R was run to identify differentially expressed genes (DEGs) in the training dataset.
