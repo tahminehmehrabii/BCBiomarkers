@@ -5,8 +5,8 @@ library(ggplot2)
 library(ggrepel)
 library(pheatmap)
 
-# Set working directory
-setwd("C:/Users/MHR/Desktop/Breast")
+#### Differential expression analysis ####
+##########################################
 
 # log2 transform
 log2trans <- function(expr) {
@@ -71,3 +71,4 @@ write_tsv(tT, "Results/differentialExpressionAnalysis/topTable.tsv")
 write_csv(tT, "Results/differentialExpressionAnalysis/topTable.csv")
 
 updown(tT)
+##########################################
