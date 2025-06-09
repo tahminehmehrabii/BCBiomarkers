@@ -1,0 +1,9 @@
+"","Centrality measure","Contribution"
+"1","Degree.Centrality",13.8749282700188
+"2","Closeness.centrality..Latora.",13.5785125178841
+"3","Harmonic.Centrality",13.5785125178841
+"4","Closeness.Centrality..Freeman.",12.9944337966425
+"5","Kleinberg.s.authority.centrality.scores",12.9014662245467
+"6","Kleinberg.s.hub.centrality.scores",12.9014662245467
+"7","K.core.Decomposition",12.743650360944
+"8","Shortest.Paths.Betweenness.Centrality",7.42703008753309
