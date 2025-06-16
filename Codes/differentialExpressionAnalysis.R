@@ -1,9 +1,6 @@
 library(limma)
 library(readr)
 library(data.table)
-library(ggplot2)
-library(ggrepel)
-library(pheatmap)
 
 #### Differential expression analysis ####
 ##########################################
@@ -71,4 +68,3 @@ write_tsv(tT, "Results/differentialExpressionAnalysis/topTable.tsv")
 write_csv(tT, "Results/differentialExpressionAnalysis/topTable.csv")
 
 updown(tT)
-##########################################
