@@ -22,7 +22,7 @@ To reproduce the results, the following R scripts were executed:
 10. ROC.R was executed to evaluate the sensitivity and specificity of the candidate diagnostic genes in both training and validation datasets.
 11. trainEvaluateML.R was used to verify the ability of the diagnostic genes to distinguish between normal and tumor samples using two machine learning models: Random Forest (RF) and Support Vector Machine (SVM).
     
-![Gene Biomarkers](images/PANC1_RNASeq_Linux.png)
+![BCBiomarkers](images/BCBiomarkers.png)
 
 
 # Required software
