@@ -7,21 +7,6 @@ To discover and validate diagnostic gene biomarkers that distinguish breast canc
 
 
 
-1. mergeDatasets.R was run to merge the two microarray datasets (GSE42568 and GSE61304) based on their common genes.
-2. trainValidSplit.R was executed to split the merged datasets into training and validation datasets.
-3. batchCorrection.R was used to correct batch effects in the training and validation datasets.
-4. differentialExpressionAnalysis.R was run to identify differentially expressed genes (DEGs) in the training dataset.
-5. enrichmentAnalysis.R was performed to gain deeper insight into the biological significance of the DEGs.
-6. geneCoexpressionAnalysis.R was executed to construct co-expression modules on the training dataset using the CEMiTool package with default settings.
-7. overlappedGenes.R was used to identify overlapping genes between the DEGs and the genes within the most significant module identified by CEMiTool.
-8. centralityAnalysis.R was run to identify key genes in the protein–protein interaction (PPI) network.
-9. LASSO.R was applied to identify candidate diagnostic genes among the key genes in the training dataset.
-10. ROC.R was executed to evaluate the sensitivity and specificity of the candidate diagnostic genes in both training and validation datasets.
-11. trainEvaluateML.R was used to verify the ability of the diagnostic genes to distinguish between normal and tumor samples using two machine learning models: Random Forest (RF) and Support Vector Machine (SVM).
-
-    
-
-
 # Required software
 1. R (4.4.2)
 2. RStudio version: 2024.12.0
