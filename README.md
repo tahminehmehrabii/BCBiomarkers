@@ -4,7 +4,7 @@
 To discover and validate diagnostic gene biomarkers that distinguish breast cancer from normal tissue through integrated bioinformatics and machine-learning analysis.
 
 # Workflow
-
+![A Bioinformatics and Machine Learning Pipeline for Discovering Diagnostic Gene Biomarkers in Breast Cancer](./images/A%20Bioinformatics%20and%20Machine%20Learning%20Pipeline%20for%20Discovering%20Diagnostic%20Gene%20Biomarkers%20in%20Breast%20Cancer.png)
 
 
 # Required software
