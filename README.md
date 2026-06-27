@@ -1,14 +1,11 @@
 # A Bioinformatics and Machine Learning Pipeline for Discovering Diagnostic Gene Biomarkers in Breast Cancer
 
 # Overview
-This github repository contains the data files and analysis code used for the scientific Project titled "Integrating machine learning and bioinformatics approaches for identifying novel diagnostic gene biomarkers in Breast cancer". The files are organized into four folders:
+To discover and validate diagnostic gene biomarkers that distinguish breast cancer from normal tissue through integrated bioinformatics and machine-learning analysis.
 
-Data: which contains all the transcriptomic data required to perform the analyses.
-Codes: contains the R scripts to reproduce all analyses.
-Results: contains all the results produced by the R scripts.
+# Workflow
 
-# Reproducing the results
-To reproduce the results, the following R scripts were executed:
+
 
 1. mergeDatasets.R was run to merge the two microarray datasets (GSE42568 and GSE61304) based on their common genes.
 2. trainValidSplit.R was executed to split the merged datasets into training and validation datasets.
@@ -23,7 +20,6 @@ To reproduce the results, the following R scripts were executed:
 11. trainEvaluateML.R was used to verify the ability of the diagnostic genes to distinguish between normal and tumor samples using two machine learning models: Random Forest (RF) and Support Vector Machine (SVM).
 
     
-![BCBiomarkers](images/BCBiomarkers.png)
 
 
 # Required software
